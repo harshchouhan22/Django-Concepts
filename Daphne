@@ -1,0 +1,13 @@
+[Unit]
+Description=Daphne service
+After=network.target
+
+[Service]
+User=root
+Group=root
+WorkingDirectory=/home/ubuntu/eve
+Environment="DJANGO_SETTINGS_MODULE=django_project.settings"
+ExecStart=/home/ubuntu/eve/venv/bin/daphne -b 0.0.0.0 -p 8000 django_project.asgi:application
+
+[Install]
+WantedBy=multi-user.target
