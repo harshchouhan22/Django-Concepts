@@ -207,6 +207,33 @@ class ChatConsumer(AsyncWebsocketConsumer):
             }
         )
 
+from django.core.paginator import Paginator, EmptyPage
+from rest_framework.response import Response
+#Paginated Responses
+def paginate_queryset(request, data, serializer, page_number, size):
+    paginator = Paginator(data, size)
+    try:
+        page = paginator.get_page(page_number)
+    except EmptyPage:
+        return Response({"data": [], 'status':200})
 
+    serializer = serializer(page, many=True)
 
+    response_data = {
+        'count': paginator.count,
+        'size': paginator.size,
+        'data': serializer.data,
+        'page_num': page_number
+    }
+    return response_data
+
+class PaginatedAPI(APIView):
+    def get(self, request):
+        #school Queryset
+        page_number = int(request.GET.get('page', 0))
+        size = request.GET.get('size', 10)
+        school = School.objects.all()
+        serializer = SchoolSerializer
+        paginated_result = paginate_queryset(request, school, serializer, page_number, size)
+        return paginated_result
 
